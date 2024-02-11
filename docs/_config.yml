@@ -1,4 +1,7 @@
-theme: jekyll‐theme‐cayman
+# theme: jekyll‐theme‐cayman
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+- jekyll-remote-theme # add this line to the plugins list if you already have one
 markdown: kramdown
-title: ECE 3400 FA22
+title: ECE 4160 SP24
 description: Bookmark this to keep an eye on my project updates!
