@@ -1,0 +1,104 @@
+---
+layout: default
+title: Lab 2
+---
+<div class="blurb">
+	<h1>Lab 2</h1>
+
+    <h2>Summary</h2>
+    <p>
+		During this lab, we investigated the use of phototransistors in order to detect the treasure later 
+		on in the labs, which are represented with the infrared LEDs. In order to do so, we built circuits to 
+		use these phototransistors, and one of its pins went to an analog pin that we can read using the 
+		Arduino nano every. In order to do so, we utilized the transistors provided to us, some sample infrared 
+		lights, as well as the signal generator.  
+    </p>
+
+    <h2>Phototransistors</h2>
+    <p>
+		In order to construct our phototransistor circuit, we utilized the LTR-301 transistor with a 2.2k Ohm 
+		resistor. These were arranged in a circuit as shown below in the image. By measuring the voltage of the 
+		pin attached to the phototransistor's emitter terminal, we can find the frequency at which the infrared LED 
+		is turning on and off. This signal is what we need in the final demonstration. 
+    </p>
+    <table>
+        <tr>
+            <th>Phototransistor Circuit</th>
+            <th>Infrared LED</th>
+            <th>Holding LED up to Phototransistor</th>
+        </tr>
+        <tr>
+            <td><img src="/ayz27/ayz27.github.io/media/lab2/phototransistors.jfif" height="200px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab2/ir_led.jfif" height="200px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab2/ir_led_with_phototransistor.jfif" height="200px"></td>
+        </tr>
+    </table>
+
+    <h2>Measuring the Phototransistor</h2>
+    <p>
+        In order to interpret the signal we read from the phototransistor, we used the signal generator to provide a sample signal 
+		that we might expect to read during the final demonstration. To do this, we hooked up the signal generator up to an infrared 
+		LED and held it up to the phototransistor. Next, we attached the oscilliscope to the emitter terminal of the phototransistor, as 
+		well as ground. Turning the knobs to move the signal into focus, we can get an in-depth look at what the signal looks like. This 
+		will help us better interpret the signal in our code. We tested this with both a 1kHz and 9kHz signal. While both can clearly be 
+		seen from the oscilliscope, one is more clear and less distorted than the other. This is because for the 9kHz signal, a high and 
+		low period each take less time than the 1kHz signal, and the rise and fall time for the phototransistor stays constant. Therefore, 
+		these two rise and fall times will take up a larger percentage of the high/low periods of the 9kHz signal, meaning that they will 
+		be more noticable. Thus, it appears that the 9kHz signal is more distorted. 
+    </p>
+
+	<table>
+        <tr>
+            <th>1kHz</th>
+            <th>9kHz</th>
+        </tr>
+        <tr>
+            <td><img src="/ayz27/ayz27.github.io/media/lab2/1khz.jfif" height="200px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab2/9khz.jfif" height="200px"></td>
+        </tr>
+    </table>
+
+    <p>
+		With the Arduino Nano Every, we can measure the frequency of the infrared signal with the timer/counter integrated in the microcontroller. 
+		This way, we are able to use the DACREF value, which is representing the ambient light value measured by the phototransistor, to determine the 
+		accurate frequency. We are able to tell if this value is valid depending on if the difference between the two inputs is positive, which are affected 
+		by ambient light and the signal from the phototransistor. Some examples of this are below. With three sensors on the front, left, and right sides of 
+		our robot, we will be able to detect treasure very comprehensively. 
+    </p>
+
+	<table>
+        <tr>
+            <th>Serial Output</th>
+        </tr>
+        <tr>
+            <td><img src="/ayz27/ayz27.github.io/media/lab2/serial.jfif" height="200px"></td>
+        </tr>
+    </table>
+
+    <h2>7 Segment Display</h2>
+    <p>
+        In order to display the proper values during our demo, we need a 7 segment display with 4 digits to display the frequency we measure. We worked on programming 
+		this with the Nano, a 74HC595 shift register, 2N3906 transistors, and current limiting resistors. With this setup, we can decrease the number of GPIO pins we 
+		need to acomplish the task. Even though we can only light one digit at a time, the purpose of the shift register was to allow us to light each digit in order, 
+		and have it passed to the shift register which would send it to the display. Even though the LEDs are only on for a brief period of time, if we cycle every 5ms, 
+		the LEDs glow for a short period that is long enough that we see all digits at once. Here are some examples of this phenomenon in action. 
+    </p>
+    
+	<table>
+        <tr>
+            <th>28</th>
+            <th>246</th>
+			<th>248</th>
+            <th>468</th>
+			<th>2468</th>
+        </tr>
+        <tr>
+            <td><img src="/ayz27/ayz27.github.io/media/lab2/28.jfif" height="200px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab2/246.jfif" height="200px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab2/248.jfif" height="200px"></td>
+			<td><img src="/ayz27/ayz27.github.io/media/lab2/468.jfif" height="200px"></td>
+			<td><img src="/ayz27/ayz27.github.io/media/lab2/2468.jfif" height="200px"></td>
+        </tr>
+    </table>
+
+</div><!-- /.blurb -->

@@ -1,0 +1,137 @@
+---
+layout: default
+title: Lab 4
+---
+<div class="blurb">
+	<h1>Lab 4</h1>
+
+    <h2>Summary</h2>
+    <p>
+		During this lab, we put together the entirety of our work from the previous labs, designed and manufactured a custom 
+		printed circuit board (PCB) for our robot, and successfully navigated the final maze in our demo. This included implementing 
+		PID control of our motors, depth-first search, as well as integrating everything from our previous labs. All together, our 
+		robot is able to use its Arduino Nano Every to detect and start navigation upon hearing a trigger note, and traverse and solve 
+		any rectangular shaped maze whilst searching for two treasures, which are infrared lights of various frequencies. All of this 
+		is accomplished in a neat, compact package using a PCB which incaspulates all of our former breadboard wiring. Overall, we 
+		learned a lot from implementing everything we've worked with into a robot which successfully accomplished the complex task. 
+    </p>
+
+    <h2>PCB Design</h2>
+    <p>
+		We decided that since we already spent a significant amount of time on wiring our messy breadboard and debugging whenever there 
+		was a small collision that may or may not have unplugged one of the wires, a PCB would be a better solution. In doing so, we 
+		made our robot much more compact and organized, and also looked a lot better. Pictures of our robot with the board as well as 
+		one of the schematics and layouts can be seen below. 
+    </p>
+    <table>
+        <tr>
+            <th>PCB</th>
+            <th>A schematic</th>
+			<th>Robot with PCB</th>
+			<th>Top Angle</th>
+        </tr>
+        <tr>
+            <td><img src="/ayz27/ayz27.github.io/media/lab4/pcb.png" height="250px"></td>
+			<td><img src="/ayz27/ayz27.github.io/media/lab4/schematic.png" height="250px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab4/robotfront.png" height="250px"></td>
+			<td><img src="/ayz27/ayz27.github.io/media/lab4/top.png" height="250px"></td>
+        </tr>
+    </table>
+
+    <h2>PID tuning and Movement</h2>
+    <p>
+		In order to properly navigate through the maze, accounting for movement error, we needed to implement some sort of PID loop to 
+		guide the robot. Although we tried to utilize a low-pass circuit to minimize noise, we were unable to get usable data from the 
+		encoders that didn't contain significant amounts of error. Therefore, we relied on ultrasonic sensor data to guide our movement. 
+		Our PID loop works on an adaptive system depending on the robot environment; namely, the walls it sees. Since at any point in the 
+		maze, the bot can have anywhere between 0 and 2 walls to its left and right, we have different scenarios coded for each. When the 
+		robot sees both walls, it will tune off both, using the difference in ultrasonic sensor readings as the error. However, when the robot 
+		only sees one wall, it will calculate error as the difference between the reading and a pre-set value, a distance that the robot 
+		attempts to maintain from the wall. Whether or not a wall was on either side was measured by checking if the sensor reading wasn't zero 
+		(meaning it wasn't working) and that it was reasonable, i.e. less than some constant. Finally, if the robot doesn't see any wall, it just 
+		continues straight by setting error to be zero, hoping that we encounter a wall soon. Based on the error calculated, the motors will be 
+		provided with less or more power in order to steer in the appropriate direction. For our PID loop, we found through testing that the I 
+		value wasn't usually very useful for our tuning, so we only use P and D.  
+
+		One problem we encountered was the placement of the ultrasonic sensors. Through significant amounts of testing, we found that the sensors 
+		have to be offset in front of the wheel axes in order to "see" the error sooner to avoid overcorrecting when the robot is close to the wall. 
+		To fascilitate this, we decided to have our robot drive backwards to place the sensors in the appropriate positive. You can see a picture 
+		of this configuration below, as well as a video of our robot's PID tuning in action. 
+    </p>
+
+	<table>
+        <tr>
+            <th>Robot</th>
+			<th>PID in action</th>
+        </tr>
+        <tr>
+            <td><img src="/ayz27/ayz27.github.io/media/lab4/robot.png" height="250px"></td>
+			<td>
+				<video height="250" controls>
+					<source src="/ayz27/ayz27.github.io/media/lab4/pid.mov" type="video/mp4">
+				</video>
+			</td>
+        </tr>
+    </table>
+
+	<h2>RF Communication</h2>
+    <p>
+		In order to communicate the frequencies our robot finds in the maze, we needed to implement RF communication with the base station. This was done 
+		using a Nordic nRF24L01 transceiver and adapter circuit board on both Arduino Nano Everys. While the base station constantly listens, the robot is 
+		programmed to send the frequency it meaures with the phototransistors to the base station over this transceiver. This was done with the robot 
+		designated as the primary transmitter (PTX) and the base station as the primary reciever (PRX). When this number was recieved, the base station would 
+		then display it on the 7 segment display we used in a previous lab. 
+		
+		In order to make sure this number was accurate, we enacted a few measures to minimize noise in our data. First, we made sure to read the phototransistors 
+		multiple times with the robot to have many attempts in case for some reason, as we saw a couple times, occasionally the transistors would stop functioning. 
+		Then, if we detected a treasure, we would average all the readings to minimize noise and send that value to the base station. There, the 7 segment display 
+		can only display 4 digits, so we added functionality for the base station to display larger frequency by inserting decimal points. This way, the Hz measurement 
+		was converted to kHz and properly displayed. You can see a picture of the mock treasures we measured and base station below. 
+	<table>
+        <tr>
+            <th>Treasure</th>
+			<th>Base Station</th>
+        </tr>
+        <tr>
+            <td><img src="/ayz27/ayz27.github.io/media/lab4/treasure.png" height="250px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab4/display.png" height="250px"></td>
+        </tr>
+    </table>
+
+    <h2>DFS Navigation</h2>
+    <p>
+		To traverse the maze properly, we implemented an optimized version of the depth-first search (DSF) presented in class. We define visited squares as squares that 
+		we have been in, and frontier squares as those that we have seen from a visited square but not been to. The crucial realization is that at any given point, any 
+		frontier square can be accessed directly from some square along the path from the start to the robot's current position. Therefore, we used two stacks, one for 
+		frontier squares and one for our path back to the start. The robot was traverse the maze, adding new squares it sees to the frontier stack, and backtracking as it 
+		needed to if the next square it wanted to visit wasn't accessible from its current position. Every time the robot stopped and also while moving, the robot would also 
+		check for treasures; if it saw two, it would interrupt and break out of this navigation. You can see an example of this in action below on a small test maze. 
+    </p>
+	<video height="560" controls>
+		<source src="/ayz27/ayz27.github.io/media/lab4/dfs.MOV" type="video/mp4">
+	</video>
+	
+	<h2>Final Demo</h2>
+	<p>
+		In our final demo, our robot needed to accomplish a few tasks. This starts with listening for a trigger note, which was 440 Hz or Concert A. This would 
+		instruct the robot to start navigation (if this failed, a backup button was installed that did the same thing). Then, the robot would navigate through the 
+		maze using its DFS program, using PID to traverse the squares without hitting any walls. During this process, the robot would be scanning for treasures with 
+		its phototransistors. Upon finding a treasure, it blinked its LEDs and sent the measurement back to the base station. The base station would display this value 
+		until a new treasure is found. Upon finding two unique frequencies, i.e. treasures, the robot would stop and celebrate completion of the demo by blinking its LEDs 
+		perpetually. You can see a picture of the maze it navigated below. 
+	</p>
+	<img src="/ayz27/ayz27.github.io/media/lab4/maze.png" height="250px">
+
+	<h2>Result</h2>
+	<p>
+		In total, we accomplished all of the above tasks, bringing to an end a highly interdisciplinary and integrated project. You can see a video of the demo below. 
+
+		I want to take a moment to thank the professor and all the TAs of this class, but also most of all my partner, with whom we've spent so much time working on this robot. 
+		Sun has been an incredibly dedicated and resouceful partner and I'm very glad to have been able to work with her. 
+	</p>
+	
+	<video height="560" controls>
+		<source src="/ayz27/ayz27.github.io/media/lab4/finaldemo.MOV" type="video/mp4">
+	</video>
+
+</div><!-- /.blurb -->

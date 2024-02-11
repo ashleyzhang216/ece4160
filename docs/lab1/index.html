@@ -1,0 +1,106 @@
+---
+layout: default
+title: Lab 1
+---
+<div class="blurb">
+	<h1>Lab 1</h1>
+
+    <h2>Summary</h2>
+    <p>
+        During this lab, we wanted to become more comfortable with the Arduino Nano Every, since we would 
+        be using this microcontroller for the duration of this class. In order to do so, we also built our 
+        robot's main chasis with the battery packs, servos, and wheels all attached. 
+    </p>
+    <p>
+        Throughout this lab, we developed skills with using the Arduino by programming it using the Arduino 
+        language and IDE to program our robot to navigate through a maze with two servo motors and measure 
+        data about its surroundings with three ultrasonic sensors mounted in the forward, left and right 
+        directions of the robot. 
+    </p>
+
+    <h2>Construction</h2>
+    <p>
+        Constructing our robot was relatively straightforward. We attached two servo mounts to the bottom of 
+        the provided 3D-printed plate. To each of these we also added a servo motor. On top of the plate, we 
+        attached a triple AA battery pack using velcro. However, this was later exchanged in favor of a pack 
+        that could hold 4 batteries. In addition, we also used velcro to add a 9V battery on the other side 
+        of the plate. On top of these batteries we added a breadboard, on which our three ultrasonic sensors 
+        were also attached. The breadboard held our Arduino Nano Every, as well as all of the wiring. 
+    </p>
+    <p>
+        You can see what our robot looks like below.
+    </p>
+    <table>
+        <tr>
+            <th>Front View</th>
+            <th>Back View</th>
+            <th>Side View</th>
+            <th>Top View</th>
+        </tr>
+        <tr>
+            <td><img src="/ayz27/ayz27.github.io/media/lab1/front_view.JPEG" height="200px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab1/back_view.JPEG" height="200px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab1/side_view.JPEG" height="200px"></td>
+            <td><img src="/ayz27/ayz27.github.io/media/lab1/top_view.JPEG" height="200px"></td>
+        </tr>
+    </table>
+
+    <h2>Servos</h2>
+    <p>
+        In order to move our robot, we have two servo motors on the robot, on both the left and right side. They
+        are both powered from our AA battery pack and controlled by our Arduino Nano Every. In order to do so, we
+        wrote code utilizing the Servo.h library to send PWM signals to control motor speed, as well as read in 
+        servo feedback. While testing functionality, we discovered that our motor directions and speeds were different,
+        so we made adjustments to our functions to turn each motor on in each direction so that when we turn both of them
+        on in, say, the forward direction, both motors move in the same direction at the same speed. By testing with a ruler,
+        we correlated time moving and distance traveled, as well as the time needed to complete 90 degree turns. 
+    </p>
+
+    <h2>Ultrasonic Sensors</h2>
+    <p>
+        To navigate through the maze without crashing into the walls, we utilized three ultrasonic sensors, mounted in the 
+        North, East, and West directions relative to the forward heading of our robot. All of the sensors share a common trigger 
+        pin so that we always start measurements on all three sensors at once, and each of the sensors' echo pins are wired to a 
+        digital pin with a unique interrupt attached to it. Using provided example code, when we trigger a measurement with the 
+        trigger pin, all of the sensors will emitt signals that bounce off the maze walls. When the signal returns to the sensor, 
+        it triggers an interrupt, which starts an Interrupt Service Routine (ISR). During this routine, our microcontroller uses 
+        the time between the trigger and echo signal to calculate how far away the wall is. The further away the wall, the further 
+        the signal must travel to complete this journey, and thus the larger the time delay will be. To test this system, we programmed 
+        our Arduino to constantly print out sensor output, and placed objects at known distances to calibrate our calculations.
+    </p>
+
+    <h2>Lab 1 Maze Demo</h2>
+    <img src="/ayz27/ayz27.github.io/media/lab1/mazelayout.jfif" height="400px">
+    <p>
+        Putting all of it together, our culminating goal for Lab 1 was for our robot to navigate a maze, as shown above.
+        The robot would navigate from point 1 to 4, arriving at points 2 and 3 along the way. Then, it would
+        backtrack all the way to point 1, and perform a 540 degree turn to end its journey. At each point the
+        robot reaches, it prints data captured by each of its three ultrasonic sensors.
+    </p>
+    <p>
+        Below, you can see a video of our robot performing the demo on the left side, and a video of the corresponding
+        console output on the right side.
+    </p>
+
+    <table>
+        <tr>
+            <th>Demo</th>
+            <th>Console</th>
+        </tr>
+        <tr>
+            <td>
+                <video height="350" controls>
+                    <source src="/ayz27/ayz27.github.io/media/lab1/demo.MOV">
+                    Your browser does not support this video format.
+                </video>
+            </td>
+            <td>
+                <video height="350" controls>
+                    <source src="/ayz27/ayz27.github.io/media/lab1/console.MOV">
+                    Your browser does not support this video format.
+                </video>
+            </td>
+        </tr>
+    </table>
+
+</div><!-- /.blurb -->

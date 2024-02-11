@@ -35,20 +35,21 @@ unsigned long currentMillis = 0;
 
 enum CommandTypes
 {
-    PING,
-    SEND_TWO_INTS,
-    SEND_THREE_FLOATS,
-    ECHO,
-    DANCE,
-    SET_VEL,
-    GET_TIME_MILLIS,
-    GET_MANY_TIME_MILLIS,
-    SEND_TIME_DATA,
-    GET_TEMP_READINGS
+    PING = 0,
+    SEND_TWO_INTS = 1,
+    SEND_THREE_FLOATS = 2,
+    ECHO = 3,
+    DANCE = 4,
+    SET_VEL = 5,
+    GET_TIME_MILLIS = 6,
+    GET_MANY_TIME_MILLIS = 7,
+    SEND_TIME_DATA = 8,
+    GET_TEMP_READINGS = 9
 };
 
 #define NUM_TIMESTAMPS 500
 unsigned long timestamps[NUM_TIMESTAMPS];
+int temperatures[NUM_TIMESTAMPS];
 
 void
 handle_command()
@@ -188,6 +189,24 @@ handle_command()
               tx_estring_value.clear();
               tx_estring_value.append("T:");
               tx_estring_value.append((int)(timestamps[i]));
+              tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            }
+
+            break;
+
+        case GET_TEMP_READINGS:
+
+            for(unsigned long i = 0; i < NUM_TIMESTAMPS; i++) {
+              timestamps[i] = millis();
+              temperatures[i] = analogReadTemp();
+            }
+
+            for(unsigned long i = 0; i < NUM_TIMESTAMPS; i++) {
+              tx_estring_value.clear();
+              tx_estring_value.append("T:");
+              tx_estring_value.append((int)(timestamps[i]));
+              tx_estring_value.append(",");
+              tx_estring_value.append((int)(temperatures[i]));
               tx_characteristic_string.writeValue(tx_estring_value.c_str());
             }
 
