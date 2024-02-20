@@ -7,41 +7,36 @@ title: Lab 1
 
     <h2>Summary</h2>
     <p>
-        During this lab, we wanted to become more comfortable with the Arduino Nano Every, since we would 
-        be using this microcontroller for the duration of this class. In order to do so, we also built our 
-        robot's main chasis with the battery packs, servos, and wheels all attached. 
-    </p>
-    <p>
-        Throughout this lab, we developed skills with using the Arduino by programming it using the Arduino 
-        language and IDE to program our robot to navigate through a maze with two servo motors and measure 
-        data about its surroundings with three ultrasonic sensors mounted in the forward, left and right 
-        directions of the robot. 
+        During this lab, we wanted to become more comfortable with the Artemis board, since we would 
+        be using this microcontroller for the duration of this class. In order to do so, I tested some basic 
+        example programs on the board, and implemented basic bluetooth functionality to make it compatible with 
+        the jupyter lab virtual environment. 
     </p>
 
-    <h2>Construction</h2>
+    <h2>Test Programs</h2>
     <p>
-        Constructing our robot was relatively straightforward. We attached two servo mounts to the bottom of 
-        the provided 3D-printed plate. To each of these we also added a servo motor. On top of the plate, we 
-        attached a triple AA battery pack using velcro. However, this was later exchanged in favor of a pack 
-        that could hold 4 batteries. In addition, we also used velcro to add a 9V battery on the other side 
-        of the plate. On top of these batteries we added a breadboard, on which our three ultrasonic sensors 
-        were also attached. The breadboard held our Arduino Nano Every, as well as all of the wiring. 
+        After receiving the board, the first order of business was making sure that it worked properly. To do 
+        this, I was tasked with uploading a few example programs onto the board and making sure the output was 
+        as expected. The first one was a blink program, just to make sure that I could actually program the Artemis 
+        board. Next, I made sure that the serial communication worked, and that two way messages could be sent and 
+        received. After that, I tested the analog temperature sensor on the board. And finally, I also ensured that 
+        the microphone functioned properly. 
     </p>
     <p>
         You can see what our robot looks like below.
     </p>
     <table>
         <tr>
-            <th>Front View</th>
-            <th>Back View</th>
-            <th>Side View</th>
-            <th>Top View</th>
+            <th>Blink</th>
+            <th>Serial</th>
+            <th>Temperature</th>
+            <th>Microphone</th>
         </tr>
         <tr>
-            <td><img src="/ayz27/ayz27.github.io/media/lab1/front_view.JPEG" height="200px"></td>
-            <td><img src="/ayz27/ayz27.github.io/media/lab1/back_view.JPEG" height="200px"></td>
-            <td><img src="/ayz27/ayz27.github.io/media/lab1/side_view.JPEG" height="200px"></td>
-            <td><img src="/ayz27/ayz27.github.io/media/lab1/top_view.JPEG" height="200px"></td>
+            <td><video height="200px" autoplay><source src="media/lab1/IMG_9649.MOV"></video></td>
+            <td><img src="media/lab1/serial_example.png" height="200px"></td>
+            <td><img src="media/lab1/temp_sensor.png" height="200px"></td>
+            <td><img src="media/lab1/mic_sensor.png" height="200px"></td>
         </tr>
     </table>
 
