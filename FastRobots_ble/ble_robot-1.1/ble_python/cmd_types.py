@@ -14,3 +14,4 @@ class CMD(Enum):
     GET_ROLL_PITCH = 10
     GET_GYRO_DATA = 11
     GET_ACC_GYRO_DATA = 12
+    GET_DIST_DATA = 13
