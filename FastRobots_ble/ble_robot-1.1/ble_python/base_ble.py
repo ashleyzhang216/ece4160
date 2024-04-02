@@ -10,7 +10,7 @@ import platform
 
 # If macOS >=12.0
 OS_PLATFORM = platform.system()
-IS_ATLEAST_MAC_OS_12 = True
+IS_ATLEAST_MAC_OS_12 = False
 if OS_PLATFORM == 'Darwin':
     import objc
     IS_ATLEAST_MAC_OS_12 = objc.macos_available(12,0)
@@ -90,6 +90,18 @@ class BLEAsyncDevice():
             if self.client.is_connected:
                 self.client.set_disconnected_callback(self.disconnect_handler)
                 LOG.info("Connected to {}".format(self.address))
+
+            # async with BleakClient(device) as self.client:
+            #     try:
+            #         await self.client.connect()
+            #         success = True
+            #     except Exception as e:
+            #         self.error_msg = str(e)
+            #         LOG.error(e)
+    
+            #     if self.client.is_connected:
+            #         self.client.set_disconnected_callback(self.disconnect_handler)
+            #         LOG.info("Connected to {}".format(self.address))
             
             return success
     
