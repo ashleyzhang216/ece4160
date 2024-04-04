@@ -14,5 +14,6 @@ void setup() {
 }
 
 void loop() {
-  ble_loop();
+  // ble_loop();
+  motor_test();
 }

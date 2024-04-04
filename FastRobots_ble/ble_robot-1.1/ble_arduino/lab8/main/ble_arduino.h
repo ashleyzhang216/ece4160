@@ -141,8 +141,8 @@ handle_command()
             if (!success)
                 return;
 
-            cur_l_pwm = move_motor(L_MOTOR, cur_l_speed);
             cur_r_pwm = move_motor(R_MOTOR, cur_r_speed);
+            cur_l_pwm = move_motor(L_MOTOR, cur_l_speed);
 
             delay(move_duration);
             brake_motors();
@@ -258,8 +258,6 @@ ble_loop()
         Serial.print("Connected to: ");
         Serial.println(central.address());
 
-        // delay(2000);
-
         // While central is connected
         while (central.connected()) {
 
@@ -270,7 +268,7 @@ ble_loop()
             read_data();
 
             // delay(2000);
-            // cur_l_pwm = move_motor(L_MOTOR, 50);
+            // cur_l_pwm = move_motor(L_MOTOR, -50);
             // delay(1000);
             // brake_motors();
         }
