@@ -5,66 +5,89 @@ title: Lab 2
 <div class="blurb">
 	<h1>Lab 2</h1>
 
-    <h2>Summary</h2>
+    <h2>Preview and Code Restructuring</h2>
     <p>
-		During this lab, we investigated the use of phototransistors in order to detect the treasure later 
-		on in the labs, which are represented with the infrared LEDs. In order to do so, we built circuits to 
-		use these phototransistors, and one of its pins went to an analog pin that we can read using the 
-		Arduino nano every. In order to do so, we utilized the transistors provided to us, some sample infrared 
-		lights, as well as the signal generator.  
+        In this lab, we integrated the ICM-20948 IMU sensor into our Artemis board. Following the setup instructions for the IMU was very 
+        straightforward, and no major issues were run into during the programming of the board with a test script. However, during this time, 
+        I added a major code restructuring into the Arduino script. Previously, the primary .ino file was the provided arduino_ble.ino, but this 
+        wasn't ideal to me since structuring around BLE made it difficult to add or change board functionality. Inspired by my previous experience 
+        building and maintaining C++ projects, I changed arduino_ble into a header file, and defined a completely different main.ino file. setup() 
+        and loop() in arduino_ble simply became ble_setup() and ble_loop(), and these were essentially the only thing called inside the main.ino file 
+        before integrating the IMU further. This was done from the beginning since I anticipated much more difficulty if I had attemped this restructuring 
+        when it was required later on in the lab. To complete the earlier sections of the lab, I simply added another imu_setup() (defined in a new header file 
+        dedicated to the IMU) and imu_loop(), and selectively commented out the loop I didn't want to execute. 
     </p>
 
-    <h2>Phototransistors</h2>
+    <h2>Adding the IMU</h2>
     <p>
-		In order to construct our phototransistor circuit, we utilized the LTR-301 transistor with a 2.2k Ohm 
-		resistor. These were arranged in a circuit as shown below in the image. By measuring the voltage of the 
-		pin attached to the phototransistor's emitter terminal, we can find the frequency at which the infrared LED 
-		is turning on and off. This signal is what we need in the final demonstration. 
+		Installing the IMU library in the Arduino IDE went smoothly. I initially just uploaded the script directly to the Artemis, but was confused when 
+        the Artemis wasn't able to properly connect to the IMU. Turns out, I had overlooked AD0_VAL. Reading the comments in the provided example code, I 
+        inspected the IMU and found that since the ADR jumper was closed, AD0_VAL should be set to 0. Adding this change to my code resulted in a functioning 
+        IMU and data printed to console. 
+    </p>
+    <p>
+        After experimenting a bit with the IMU, I found all the sensor data to be relatively accurate. Acceleration changed when I moved the IMU around, and by 
+        testing, I figured out how the axes of the IMU aligned with the physical board. Likewise, gyro data was non-neglible when I was actively rotating the IMU 
+        about some axis. However, the magnetometer was a little trickier to get meaningful data out of it. However, I eventually figured out that bringing the 
+        IMU closer to electronically noisy things like my laptop or phone could induce large changes in the data. 
     </p>
     <table>
         <tr>
-            <th>Phototransistor Circuit</th>
-            <th>Infrared LED</th>
-            <th>Holding LED up to Phototransistor</th>
+            <th>Test Script</th>
+            <th>AD0_VAL</th>
         </tr>
         <tr>
-            <td><img src="/ayz27/ayz27.github.io/media/lab2/phototransistors.jfif" height="200px"></td>
-            <td><img src="/ayz27/ayz27.github.io/media/lab2/ir_led.jfif" height="200px"></td>
-            <td><img src="/ayz27/ayz27.github.io/media/lab2/ir_led_with_phototransistor.jfif" height="200px"></td>
+            <td><video height="200px" controls><source src="https://ashleyzhang216.github.io/ece4160/media/lab2/IMG_0991.MOV">Your browser does not support this video format.</video></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/AD0_VAL.png" height="200px"></td>
         </tr>
     </table>
 
-    <h2>Measuring the Phototransistor</h2>
+    <h2>Getting Pitch and Roll</h2>
     <p>
-        In order to interpret the signal we read from the phototransistor, we used the signal generator to provide a sample signal 
-		that we might expect to read during the final demonstration. To do this, we hooked up the signal generator up to an infrared 
-		LED and held it up to the phototransistor. Next, we attached the oscilliscope to the emitter terminal of the phototransistor, as 
-		well as ground. Turning the knobs to move the signal into focus, we can get an in-depth look at what the signal looks like. This 
-		will help us better interpret the signal in our code. We tested this with both a 1kHz and 9kHz signal. While both can clearly be 
-		seen from the oscilliscope, one is more clear and less distorted than the other. This is because for the 9kHz signal, a high and 
-		low period each take less time than the 1kHz signal, and the rise and fall time for the phototransistor stays constant. Therefore, 
-		these two rise and fall times will take up a larger percentage of the high/low periods of the 9kHz signal, meaning that they will 
-		be more noticable. Thus, it appears that the 9kHz signal is more distorted. 
+        Next, I refreshed myself with the pitch and roll equations from class. Taking advantage of the fact that gravity will always point down, I rederived the equations 
+        given on the slides in class. Using atan2() as suggested, I implemented roll as being atan2 with X-direction acceleration over Z-direction acceleration, and pitch as 
+        being atan2 with Y-direction acceleration over Z-direction acceleration. Note that not included in the screenshot is a helper function I added to convert between degrees 
+        and radians, to make my code more readable. 
     </p>
 
 	<table>
         <tr>
-            <th>1kHz</th>
-            <th>9kHz</th>
+            <th>Pitch and Roll Functions</th>
         </tr>
         <tr>
-            <td><img src="/ayz27/ayz27.github.io/media/lab2/1khz.jfif" height="200px"></td>
-            <td><img src="/ayz27/ayz27.github.io/media/lab2/9khz.jfif" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/pitch_roll_func.png" height="200px"></td>
         </tr>
     </table>
 
     <p>
-		With the Arduino Nano Every, we can measure the frequency of the infrared signal with the timer/counter integrated in the microcontroller. 
-		This way, we are able to use the DACREF value, which is representing the ambient light value measured by the phototransistor, to determine the 
-		accurate frequency. We are able to tell if this value is valid depending on if the difference between the two inputs is positive, which are affected 
-		by ambient light and the signal from the phototransistor. Some examples of this are below. With three sensors on the front, left, and right sides of 
-		our robot, we will be able to detect treasure very comprehensively. 
+        Next, I tested the limits of the system. For both pitch and roll, I've included screenshots of the serial monitor output when holding the IMU at -90, 0, and 90 degrees. 
+        Overall, I found the sensor to be very accurate. I had expected much more variance in data around 90 degrees since the axes would be perpendicular to the floor, and thus 
+        any noise in the raw acceleration data could cause large swings in pitch and roll output data. However, I found my sensor to be remarkably resilient to this. I, for one, 
+        am definitely not complaining about not needing a two-point calibration.  
     </p>
+
+    <table>
+        <tr>
+            <th>Pitch @ -90</th>
+            <th>Pitch @ 0</th>
+            <th>Pitch @ 90</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/pitch_-90.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/pitch_0.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/pitch_90.png" height="200px"></td>
+        </tr>
+        <tr>
+            <th>Roll @ -90</th>
+            <th>Roll @ 0</th>
+            <th>Roll @ 90</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/roll_-90.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/roll_0.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/roll_90.png" height="200px"></td>
+        </tr>
+    </table>
 
 	<table>
         <tr>
