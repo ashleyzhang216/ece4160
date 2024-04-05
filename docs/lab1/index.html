@@ -60,7 +60,7 @@ title: Lab 1
             <th>MAC Address</th>
         </tr>
         <tr>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/mac_addr.png" height="100px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/mac_addr.png" height="50px"></td>
         </tr>
     </table>
 
@@ -78,18 +78,18 @@ title: Lab 1
             <th>Connections</th>
         </tr>
         <tr>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/uuid.png" height="200px"></td>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/connections.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/uuid.png" height="150px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/connections.png" height="150px"></td>
         </tr>
         <tr>
             <th>Connected</th>
         </tr>
         <tr>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/connected.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/connected.png" height="150px"></td>
         </tr>
     </table>
 
-    <h2>Bluetooth Experimentation</h2>
+    <h2>Using Bluetooth</h2>
     <p>
         With a connection established, I proceeded to the other tasks in the lab. I modified the Arduino script to implement the ECHO case. 
         The provided code already read the incoming message and placed it in char_arr. After some experimentation, I found that by simply 
@@ -108,56 +108,72 @@ title: Lab 1
             <th>Getting Time</th>
         </tr>
         <tr>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/echo.png" height="150px"></td>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_time.png" height="150px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/echo.png" height="125px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_time.png" height="125px"></td>
         </tr>
         <tr>
             <th>Notif Handler</th>
             <th>Getting Time with Handler</th>
         </tr>
         <tr>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/time_notif_handle.png" height="200px"></td>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_time_with_notif_handle.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/time_notif_handle.png" height="100px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_time_with_notif_handle.png" height="100px"></td>
         </tr>
     </table>
-    
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_temp_loop.png" height="200px">
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_time_loop.png" height="200px">
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_time_transmit_loop.png" height="200px">
 
-
-    <h2>Lab 1 Maze Demo</h2>
-    <img src="/ayz27/ayz27.github.io/media/lab1/mazelayout.jfif" height="400px">
+    <h2>Bluetooth Experimentation</h2>
     <p>
-        Putting all of it together, our culminating goal for Lab 1 was for our robot to navigate a maze, as shown above.
-        The robot would navigate from point 1 to 4, arriving at points 2 and 3 along the way. Then, it would
-        backtrack all the way to point 1, and perform a 540 degree turn to end its journey. At each point the
-        robot reaches, it prints data captured by each of its three ultrasonic sensors.
-    </p>
-    <p>
-        Below, you can see a video of our robot performing the demo on the left side, and a video of the corresponding
-        console output on the right side.
+        With my notification handler working well, I did some experimentation on the performance of the data transmission. I set up a couple more command types 
+        by adding to the existing Arduino script and modifying cmd_types.py in my jupyter notebook. The first command recorded a timestamp, and sent it to my 
+        laptop, and repeated the process for 500 times. You can see the results of this below, where the units are in milliseconds. Evidently, in between the 
+        timestamp recording, transmitting the data takes a non-neglible amount of time itself. In the example output below, this transmission can take up to 21ms! 
+        If the data being measured changed quickly or high granularity was required, this delay would certainly miss out on important details we'd want to be recorded. 
     </p>
 
     <table>
         <tr>
-            <th>Demo</th>
-            <th>Console</th>
+            <th>Output</th>
         </tr>
         <tr>
-            <td>
-                <video height="350" controls>
-                    <source src="/ayz27/ayz27.github.io/media/lab1/demo.MOV">
-                    Your browser does not support this video format.
-                </video>
-            </td>
-            <td>
-                <video height="350" controls>
-                    <source src="/ayz27/ayz27.github.io/media/lab1/console.MOV">
-                    Your browser does not support this video format.
-                </video>
-            </td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_time_transmit_loop.png" height="200px"></td>
         </tr>
     </table>
+    
+    <p>
+        So, a second command was added which flipped the script a little bit. It would first record the 500 timestamps, but this time, one after another without delay. 
+        Following this, it would send all datapoints back to my laptop at once. This way, data would be collected pretty much as fast as the Artemis board could record it. 
+        As expected, the delay between datapoints decreased substantially to >1ms (the timestamps are the same since I only recorded with ms precision). Since the Artemis 
+        board runs on a Ambiq Apollo3 clocked at 48 MHz, optimistically assuming that measuring and recording a timestamp each take a single clock cycle, this results in a 
+        period of 41.7ns. This matches up with our measured results since with this period, the board can theoretically take thousands of datapoints within 1ms. 
+    </p>
+    <p>
+        Using this approach, I added a third command which did the same thing as the second, measure-all-timestamps-then-transmit approach. However, this command also recorded 
+        the temperature using the onboard sensor. You can see the results below. As expected, the delay between datapoints is still substantially better than when transmitting 
+        each point before recording the next, but is also substantially slower than when we only recorded timestamps. After doing some research online, this can be easily explained by the fact that analogRead(), 
+        the function used to measure the temperature, is a famously inefficient and time-consuming function to run, and is primarily used over faster alternatives for convenience 
+        purposes. However, even this delay is still neglible compared to the bluetooth delay we previously measured. 
+    </p>
+
+    <table>
+        <tr>
+            <th>Measuring Timestamps</th>
+            <th>Measuring Temperature</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_time_loop.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab1/get_temp_loop.png" height="200px"></td>
+        </tr>
+    </table>
+
+    <p>
+        Overall, comparing these approaches, the second approach of recording all data first is superior in most cases due the much greater granularity of data it can gain. 
+        However, there are a few cases where the first approach of transmitting each datapoint immediately may be better. One might need the data as soon as it is measured to be processed 
+        on the receiving laptop, for example, like if the robot was using bluetooth to transmit data about its surroundings that the laptop might use to decide what path the robot should 
+        take or actions it should execute. Additionally, this approach also uses significantly less memory, since it can discard previously measured datapoints as soon as they 
+        are sent to the base station. On the other hand, storing all the data before transmission can get expensive quickly. With only 384 kB of RAM, assuming we are measuring temperature 
+        and timestamps (which require 4 and 2 bytes respectively), only allows us to measure up to 65536 datapoints. This can run out quite quickly with our datapoint gathering speed, and can 
+        run out even faster if other large blocks of memory are used elsewhere. So, using the first approach would also be suitable if you would like to measure a very large amount of data or 
+        if memory is limited.  
+    </p>
 
 </div><!-- /.blurb -->
