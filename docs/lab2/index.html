@@ -63,7 +63,7 @@ title: Lab 2
         Next, I tested the limits of the system. For both pitch and roll, I've included screenshots of the serial monitor output when holding the IMU at -90, 0, and 90 degrees. 
         Overall, I found the sensor to be very accurate. I had expected much more variance in data around 90 degrees since the axes would be perpendicular to the floor, and thus 
         any noise in the raw acceleration data could cause large swings in pitch and roll output data. However, I found my sensor to be remarkably resilient to this. I, for one, 
-        am definitely not complaining about not needing a two-point calibration.  
+        am definitely not complaining about not needing a two-point calibration. 
     </p>
 
     <table>
@@ -89,39 +89,162 @@ title: Lab 2
         </tr>
     </table>
 
-	<table>
+    <h2>Fourier Transforms</h2>
+    <p>
+        Since the data still had some noise, I decided to run a fourier transform to analyze it. First, I added a command very similar to the temperature data gathering command 
+        from the previous lab. When the Artemis receives this command, it simply records all of its IMU data for 500 datapoints before sending it all back to my laptop, where I can 
+        properly analyze it. In my jupyter notebook, I store the data, and use it and the timestamps to integrate the gyro data to get heading. While I don't use this data for now, I 
+        figured I would have to eventually implement it later anyways. Using <a href="https://pythonnumericalmethods.berkeley.edu/notebooks/chapter24.03-Fast-Fourier-Transform.html">this</a> 
+        site as a guide, I implemented a basic Fast Fourier Transform and got the data below, which is the output generated from me moving the IMU around randomly. 
+    </p>
+
+    <table>
         <tr>
-            <th>Serial Output</th>
+            <th>Roll w/o FFT</th>
+            <th>Roll with FFT</th>
         </tr>
         <tr>
-            <td><img src="/ayz27/ayz27.github.io/media/lab2/serial.jfif" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/roll_no_fft.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/roll_fft.png" height="200px"></td>
+        </tr>
+        <tr>
+            <th>Pitch w/o FFT</th>
+            <th>Pitch with FFT</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/pitch_no_fft.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/pitch_fft.png" height="200px"></td>
         </tr>
     </table>
 
-    <h2>7 Segment Display</h2>
+    <h2>Low Pass Filter</h2>
     <p>
-        In order to display the proper values during our demo, we need a 7 segment display with 4 digits to display the frequency we measure. We worked on programming 
-		this with the Nano, a 74HC595 shift register, 2N3906 transistors, and current limiting resistors. With this setup, we can decrease the number of GPIO pins we 
-		need to acomplish the task. Even though we can only light one digit at a time, the purpose of the shift register was to allow us to light each digit in order, 
-		and have it passed to the shift register which would send it to the display. Even though the LEDs are only on for a brief period of time, if we cycle every 5ms, 
-		the LEDs glow for a short period that is long enough that we see all digits at once. Here are some examples of this phenomenon in action. 
+        Based on the fourier transform data, I decided to implement a cutoff frequency at 10 Hz for both axes, since this seemed to be the point past meaningul signals of non-negligible magnitudes for both pitch and roll.  
+        This decision was further supported by the maximum sample rate of the accelerometer (plus time for storing the data), which seemed to be around 220 Hz on average, meaning it could capture all the relevant signals we wanted to see. 
     </p>
-    
-	<table>
+
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab2/lp_filter.png" height="200px">
+
+    <p>
+        To implement this, I followed the instructions from lecture, calculating the RC value for both axes (which are the same), and using this to calculate alpha. I've included 
+        a small code snippet of this above. Running this filter on the same data shown above, you can see some spots wihere the jittery parts of the curve are smoothed out a little bit, 
+        especially on the graph for pitch. 
+    </p>
+
+    <table>
         <tr>
-            <th>28</th>
-            <th>246</th>
-			<th>248</th>
-            <th>468</th>
-			<th>2468</th>
+            <th>Roll w/o LP Filter</th>
+            <th>Roll with LP Filter</th>
         </tr>
         <tr>
-            <td><img src="/ayz27/ayz27.github.io/media/lab2/28.jfif" height="200px"></td>
-            <td><img src="/ayz27/ayz27.github.io/media/lab2/246.jfif" height="200px"></td>
-            <td><img src="/ayz27/ayz27.github.io/media/lab2/248.jfif" height="200px"></td>
-			<td><img src="/ayz27/ayz27.github.io/media/lab2/468.jfif" height="200px"></td>
-			<td><img src="/ayz27/ayz27.github.io/media/lab2/2468.jfif" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/roll_no_lp.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/roll_lp.png" height="200px"></td>
+        </tr>
+        <tr>
+            <th>Pitch w/o LP Filter</th>
+            <th>Pitch with LP Filter</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/pitch_no_lp.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/pitch_lp.png" height="200px"></td>
         </tr>
     </table>
+
+    <h2>Gyroscope</h2>
+	<p>
+        As discussed above, I implemented the integration of the gyro data to calculate heading earlier in the lab. To go in more detail, for the gyro, each data point I collected 
+        contained both the gyro data in each axes, but also a timestamp. In between each datapoint, I calculate the time delta and add its product with the gyro data to the current 
+        heading, which I initialize as 0. For the same data I've been showing above, you can see the heading calculated with gyro data below for all three axes. I additionally also 
+        included a graph the gyro-calculated X heading of a second run of the IMU where I just kept the sensor still. Here, you can see the main problem with the gyro. While the data 
+        is smooth and decently accurate, the sensor is vulnerable to drift, where the data will change over time. 
+    </p>
+
+    <table>
+        <tr>
+            <th>X-direction Heading</th>
+            <th>Y-direction Heading</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/gyro_x.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/gyro_y.png" height="200px"></td>
+        </tr>
+        <tr>
+            <th>Z-direction Heading</th>
+            <th>X-direction Heading w/ Drift</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/gyro_z.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/drift.png" height="200px"></td>
+        </tr>
+    </table>
+
+    <p>
+        To try to improve these results, I tested different sampling frequencies of the IMU. I found that while they all were roughly the same, higher frequencies tended to be a little 
+        bit worse with keeping a smoother signal graph (less jittering in the line), since there are more data points for noise in the data to affect the shape of the graph. However, these 
+        higher frequencies also seemed to be better at handling data of high frequencies. That is, if I moved the IMU around rapidly with my hand, measuring the IMU faster did a better job at 
+        accurately capturing all the little micro movements I induced in the sensor.  
+    </p>
+
+    <h2>Complimentary Filter</h2>
+    <p>
+        To try to get the best of both worlds, I implemented a complimentary filter to try to get the smooth signal of the gyroscope data while preventing drift using the accelerometer data. 
+        After some experimentation, I found that the drift on my gyro data was actually pretty decent, so I eventually settled on an alpha value of 0.1 which would mostly rely on the gyro data 
+        to calculate heading, with a little help from the accelerometer to prevent major drift in the signals. You can see the results below for the same data presented throughout this report, 
+        with the raw accelerometer and gyro data for comparison. Overall, I'm pretty happy with this filter, as you can still see all the major oscillations I induced on the sensor while measuring 
+        data with great detail, the resulting data curve is very smooth overall, and the drift comparison between the start and end of the data is minimal.  
+    </p>
+
+    <table>
+        <tr>
+            <th>Pitch from Accelerometer</th>
+            <th>Roll from Accelerometer</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/pitch_lp.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/roll_lp.png" height="200px"></td>
+        </tr>
+        <tr>
+            <th>Pitch from Gyro</th>
+            <th>Roll from Gyro</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/gyro_x.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/gyro_y.png" height="200px"></td>
+        </tr>
+        <tr>
+            <th>Pitch from Complimentary Filter</th>
+            <th>Roll from Complimentary Filter</th>
+        </tr>
+        <tr>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/compl_pitch.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab2/compl_roll.png" height="200px"></td>
+        </tr>
+    </table>
+
+    <h2>Sample Data</h2>
+    <p>
+        Since I had read the lab beforehand, I knew speeding up the loop was coming. So, the entirety of my code was implemented to interface with bluetooth. Each section of 
+        this lab had its own unique command associated with it, which upon receiving, the robot would collect all the data necessary first before sending it all back 
+        to my laptop via bluetooth afterwards. Through experimentation, as mentioned earlier, I found that the maximum frequency that I could record data at was about 220 Hz. 
+        This seemed to be bottlenecked by my IMU sensor, as the loop could run much faster without actually waiting for it to be ready. But, considering that most IMUs on the market 
+        that are pretty affordable operate at about 10 Hz from my experience, this is more than necessary. 
+    </p>
+    <p>
+        In terms of data storage, I had declared separate arrays for each type of data. That is, I have an array of unsigned long for timestamps, and arrys of floats for all of the roll 
+        and pitch data, as well as for the raw gyro data on all three axes. Floats were chosen for the latter since this is the native data type returned from the IMU library, and I wanted 
+        to preserve as much granularity as possible because using an int would sacrifice the decimal points, which could seriously impact accuracy. This would be most apparent in the heading 
+        calculated from gyro data, since those tiny decimal points are integrated over and over, and the error could add up fast. All in all, each datapoint contains one unsigned long for the 
+        timestamp, two floats for pitch and roll, and three floats for the gyro data on all three axes. This totals up to 4 * (2 + 3) + 4 = 24 bytes. With 384 kB of RAM, the Artemis board thus 
+        could store a theoretical maximum of 16384 datapoints. At 220 Hz, this corresponds to around 74 seconds of data, which is more than necessary to cover the 5 seconds required. In fact, 
+        the number of datapoints in the data presented throughout all of this report was carefully chosen to cover 5 seconds. 
+    </p>
+
+    <h2>Stunt!</h2>
+    <p>
+        After working with the IMU for so long, I ended this lab by performing a stunt with my robot. Despite having a lot of issues with my controller suddenly disconnecting from the robot, 
+        I managed to record a small stunt. The robot drives into a wall, performs a small turn, and then the battery proceeds to immediately die. What a stunt! :D
+    </p>
+
+    <video height="200px" controls><source src="https://ashleyzhang216.github.io/ece4160/media/lab2/stunt.MOV">Your browser does not support this video format.</video>
 
 </div><!-- /.blurb -->
