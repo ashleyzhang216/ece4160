@@ -24,7 +24,7 @@ title: Lab 3
         I soldered the wires together and applied heatshrink to ensure the joint stays connected. This process was finally repeated for the other wire as well. 
     </p>
 
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab3/CHANGEME.png" height="200px">
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab3/battery.jpg" height="200px">
 
     <h2>Wiring the ToF Sensors</h2>
     <p>
@@ -42,9 +42,9 @@ title: Lab 3
             <th>Breakout Board</th>
         </tr>
         <tr>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab3/CHANGEME.png" height="200px"></td>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab3/CHANGEME.png" height="200px"></td>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab3/CHANGEME.png" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab3/front_tof.jpg" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab3/back_tof.jpg" height="200px"></td>
+            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab3/breakout.jpg" height="200px"></td>
         </tr>
     </table>
 
@@ -62,7 +62,7 @@ title: Lab 3
         take ages to actually finish executing. After some experimentation, I found that this was due to the ToF sensor data collection call being blocking and the ToF sensor itself being 
         pretty slow to measure new datapoints. To counteract this, I wrote a new non-blocking measuring function which would report new data if it was ready using checkForDataReady(), and if it wasn't ready, report the 
         most recently measured datapoint, which you can see below (the near-identical code for the other sensor is omitted for brevity). While this would return without blocking, I expected it to lead to a stair-like graph, where jumps between sensor values when new data is available 
-        would be clearly visible. This turned out to be true, as you can see below, especially for this example where I started with my hand close to the sensor and steadily moved it further away. 
+        would be clearly visible. This turned out to be true, after running several tests where I started with my hand close to the sensor and steadily moved it further away or some similar variation. 
         With some experimentation, I found that in comparison to the very fast speed of simply recording data that the main bluetooth loop can do, the actual sensor seemed to only report data at a 
         maximum of about 24.2 Hz when in long distance mode, which is comparable to the expected 30 Hz listed on Polulu's website. 
     </p>
@@ -70,11 +70,9 @@ title: Lab 3
     <table>
         <tr>
             <th>Nonblocking ToF Code</th>
-            <th>Distance of Hand</th>
         </tr>
         <tr>
             <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab3/tof_code.png" height="200px"></td>
-            <td><img src="https://ashleyzhang216.github.io/ece4160/media/lab3/CHANGEME.png" height="200px"></td>
         </tr>
     </table>
 
@@ -87,8 +85,14 @@ title: Lab 3
 
     <h2>Testing the Limits of the Sensor</h2>
     <p>
-
+        Overall, the sensor range advertised for each of the distance modes of the sensor is pretty accurate. For example, below you can see the graph of the distance of me starting close to the sensor and slowly 
+        walking out of range in short distance mode, where the data drops off once I'm no longer in range. Accuracy was also pretty good. I tested this by using a tape measure to move myself a set distance away and 
+        comparing that distance to the one measured by the sensor. The data was remarkably accurate for most distances, except when I put my hand very close to the sensor, where the distances measured by the sensor were 
+        up to around 2% larger at worst. Still, this is just a bonus, since the Polulu website does not guarentee any accuracy for distances of less than 4cm, which is what I was testing. And as mentioned earlier, the 
+        fastest measuring frequency I got out of my sensor in the long distance mode I chose was around 24.2 Hz. 
     </p>
+
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab3/max_dist.png" height="200px">
 
     <h2>Using Both ToF Sensors</h2>
     <p>
@@ -96,9 +100,9 @@ title: Lab 3
         both sensors to the Artemis, and thus had to deal with the issue of address collision, since both sensors initialized to address 0x29 upon startup. To counteract this, I used my XSHUT pin I soldered onto 
         my back-facing ToF sensor during a new setup function I wrote to initialize both sensors. Upon running this function, I write a value of LOW to the active low XSHUT pin to shut off that ToF sensor. Next, I 
         initialize my front-facing sensor and modulate its address to 0x2A, before writing HIGH to XSHUT once again to enable me to initialize the back-facing ToF sensor with the default 0x29 address. To test this, 
-        I modified my ToF sensor command I previously wrote to measure and report data from both ToF sensors. You can see the results below of me moving my two hands back and forth in front of each sensor. 
+        I modified my ToF sensor command I previously wrote to measure and report data from both ToF sensors. You can see the results below of me moving one hand back and forth while holding the other still as a control. 
     </p>
 
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab3/CHANGEME.png" height="200px">
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab3/both_sensors.png" height="200px">
     
 </div><!-- /.blurb -->
