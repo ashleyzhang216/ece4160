@@ -26,7 +26,7 @@ title: Lab 10
         and back calculate how much to turn to match the given orientation. 
     </p>
 
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/compute_control.png" width="200px">
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/compute_control.png" width="600px">
 
     <p>
         The second part of the code gets the the new probabilities given an action we want our robot to perform, which is basically a sequence of the 
@@ -36,7 +36,7 @@ title: Lab 10
         have been done. You can see the code below. 
     </p>
 
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/odom_motion_model.png" width="200px">
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/odom_motion_model.png" width="600px">
 
     <p>
         The third step is putting it all together! Using the control implied from the previous and current odomoetry provided, we can update our bel values. We do this update 
@@ -44,14 +44,14 @@ title: Lab 10
         value with small probability to speed things up, at the expense of precision. 
     </p>
 
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/prediction_step.png" width="200px">
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/prediction_step.png" width="600px">
 
     <p>
         The fourth step is pretty simple. Mimicking the sensor behavior described, we calculate a gaussian for the results returned by the sensor across all 18 
         measurements we take, to get the final part of the equation for the filter. 
     </p>
 
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/sensor_model.png" width="200px">
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/sensor_model.png" width="600px">
 
     <p>
         Finally, the fifth step implements the full filter for one step. For all of the current positons, we calculate our belief matrix using the updates we get 
@@ -59,7 +59,7 @@ title: Lab 10
         Normalizing this, we can find the largest probability value to estimate our location in the grid. 
     </p>
 
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/update_step.png" width="200px">
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/update_step.png" width="600px">
 
     <h2>Results</h2>
     <p>
@@ -71,8 +71,8 @@ title: Lab 10
         where the estimates are a little bit off when the robot is in a somewhat symmetrical position. But overall, it still managed to do quite well, and I am happy with my accomplishment in this lab.  
     </p>
 
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/robot.png" width="200px">
-    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/map.png" width="200px">
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/robot.png" width="600px">
+    <img src="https://ashleyzhang216.github.io/ece4160/media/lab10/map.png" width="600px">
     
     
 </div><!-- /.blurb -->
